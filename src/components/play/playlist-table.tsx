@@ -97,7 +97,7 @@ export function PlaylistTable({
             };
           });
 
-          setCurrentSongIndex(currentSongIndex as number);
+          setCurrentSongIndex(newIndex);
 
           setListSong(reorderingPosition);
 
