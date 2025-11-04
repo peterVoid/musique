@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String    @id @default(cuid())
+  username    String
+  fingerPrint String    @map("finger_print")
+  boxes       Box[]
+  boxSongs    BoxSong[]
+
+  @@map("users")
+}
+
+model Box {
+  id       String    @id @default(cuid())
+  name     String
+  slug     String
+  userId   String
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  boxSongs BoxSong[]
+
+  @@map("boxes")
+}
+
+model Song {
+  id           String    @id @default(cuid())
+  title        String
+  artist       String?
+  youtubeId    String    @map("youtube_id")
+  youtubeUrl   String    @map("youtube_url")
+  duration     String
+  thumbnailUrl String?   @map("thumbnail_url")
+  boxSongs     BoxSong[]
+
+  @@map("songs")
+}
+
+model BoxSong {
+  id       String        @id @default(cuid())
+  boxId    String        @map("box_id")
+  box      Box           @relation(fields: [boxId], references: [id], onDelete: Cascade)
+  songId   String        @map("song_id")
+  song     Song          @relation(fields: [songId], references: [id], onDelete: Cascade)
+  userId   String        @map("user_id")
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  position Int
+  status   BoxSongStatus @default(QUEUED)
+
+  @@map("box_songs")
+}
+
+enum BoxSongStatus {
+  QUEUED
+  PLAYING
+  PLAYED
+}
